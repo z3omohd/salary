@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Wasan Financial Suite</title>
+ <style>
+ :root {
+ --bg-color: #f8fafc;
+ --card-bg: #ffffff;
+ --primary: #2563eb;
+ --text-main: #1e293b;
+ --text-muted: #64748b;
+ --border-color: #cbd5e1;
+ }
+
+ * {
+ box-sizing: border-box;
+ margin: 0;
+ padding: 0;
+ font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+ }
+
+ body {
+ background-color: var(--bg-color);
+ color: var(--text-main);
+ min-height: 100vh;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ justify-content: space-between;
+ padding: 10px;
+ }
+
+ .container {
+ width: 100%;
+ max-width: 900px;
+ background: var(--card-bg);
+ border-radius: 12px;
+ box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+ padding: 15px;
+ margin-top: 5px;
+ }
+
+ .financial-grid {
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ gap: 15px;
+ margin-bottom: 15px;
+ }
+
+ @media (max-width: 650px) {
+ .financial-grid {
+ grid-template-columns: 1fr;
+ }
+ }
+
+ .table-section {
+ border: 1px solid var(--border-color);
+ border-radius: 8px;
+ overflow: hidden;
+ background: #fff;
+ }
+
+ table {
+ width: 100%;
+ border-collapse: collapse;
+ text-align: right;
+ font-size: 0.85rem;
+ }
+
+ th, td {
+ padding: 8px 10px;
+ border-bottom: 1px solid var(--border-color);
+ border-left: 1px solid var(--border-color);
+ }
+
+ /* ترويسة الأصول (أزرق مؤسسي) */ .th-assets {
+ background-color: #3b82f6;
+ color: white;
+ font-weight: 600;
+ }
+
+ /* ترويسة الالتزامات (أحمر خفيف أنيق) */ .th-liabilities {
+ background-color: #ef4444;
+ color: white;
+ font-weight: 600;
+ }
+
+ input.editable-input {
+ width: 100%;
+ border: 1px solid transparent;
+ background: transparent;
+ padding: 4px;
+ font-size: 0.85rem;
+ text-align: right;
+ outline: none;
+ border-radius: 4px;
+ transition: all 0.2s;
+ }
+
+ input.editable-input:focus {
+ background: #fff;
+ border-color: var(--primary);
+ box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+ }
+
+ input.editable-input:hover {
+ background: #f8fafc;
+ border-color: #e2e8f0;
+ }
+
+ /* مجموع الأصول (أخضر خفيف هادئ) */
+ .row-green {
+ background-color: #86efac !important;
+ font-weight: bold;
+ color: #14532d;
+ }
+
+ /* مجاميع الالتزامات (أحمر خفيف مريح للعين) */ .row-red-soft {
+ background-color: #fca5a5 !important;
+ font-weight: bold;
+ color: #7f1d1d;
+ }
+
+ .summary-box {
+ margin-top: 15px;
+ border: 1px solid var(--border-color);
+ border-radius: 8px;
+ overflow: hidden;
+ }
+
+ footer {
+ text-align: center;
+ margin-top: 15px;
+ font-size: 0.75rem;
+ color: var(--text-muted);
+ border-top: 1px solid var(--border-color);
+ padding-top: 10px;
+ width: 100%;
+ max-width: 900px;
+ }
+
+ footer span {
+ color: var(--primary);
+ font-weight: bold;
+ }
+ </style>
+</head>
+<body>
+
+ <div class="container">
+ <div class="financial-grid">
+ <!-- الجدول الأيمن: الأصول والمداخيل -->
+ <div class="table-section">
+ <table>
+ <thead>
+ <tr>
+ <th class="th-assets">البند</th>
+ <th class="th-assets">المبلغ</th>
+ </tr>
+ </thead>
+ <tbody id="assetsTableBody"></tbody>
+ </table>
+ </div>
+
+ <!-- الجدول الأيسر: الالتزامات والقروض والفواتير (بالنسق الأحمر الخفيف) --> <div class="table-section">
+ <table>
+ <thead>
+ <tr>
+ <th class="th-liabilities">الالتزامات</th>
+ <th class="th-liabilities">المبلغ</th>
+ </tr>
+ </thead>
+ <tbody id="liabilitiesTableBody"></tbody>
+ </table>
+ </div>
+ </div>
+
+ <!-- جدول الصافي الختامي -->
+ <div class="summary-box">
+ <table>
+ <tbody id="summaryTableBody"></tbody>
+ </table>
+ </div>
+ </div>
+
+ <footer>
+ <span>WASAN DIGITAL STORE</span> &copy; 2026 — ALL RIGHTS RESERVED
+ </footer>
+
+ <script>
+ const currentData = {
+ assets: [
+ { name: "حساب الوكالة", amount: 50000 },
+ { name: "بايننس", amount: 17300 },
+ { name: "الراتب", amount: 5500 },
+ { name: "المكافأة", amount: 5000 },
+ { name: "", amount: 0 }
+ ],
+ liabilities: [
+ { name: "القرض الشخصي", amount: 3215.06 },
+ { name: "القرض العقاري", amount: 400 },
+ { name: "القرض Stc", amount: 415 },
+ { name: "فاتورة zain", amount: 286.35 },
+ { name: "فاتورة Stc", amount: 287.5 },
+ { name: "", amount: 0 }
+ ]
+ };
+
+ function renderTables() {
+ const assetsTbody = document.getElementById('assetsTableBody');
+ assetsTbody.innerHTML = '';
+ let totalAssets = 0;
+
+ currentData.assets.forEach((item, index) => {
+ totalAssets += Number(item.amount) || 0;
+ const tr = document.createElement('tr');
+ tr.innerHTML = `
+ <td><input type="text" class="editable-input" value="${item.name}" placeholder="أضف بند..." onchange="updateAssetName(${index}, this.value)"></td>
+ <td><input type="number" step="0.01" class="editable-input" value="${item.amount}" onchange="updateAssetAmount(${index}, this.value)"></td>
+ `;
+ assetsTbody.appendChild(tr);
+ });
+
+ const trTotal = document.createElement('tr');
+ trTotal.className = 'row-green';
+ trTotal.innerHTML = `<td>مجموع الاصول</td><td>${totalAssets.toFixed(2)}</td>`;
+ assetsTbody.appendChild(trTotal);
+
+ const liabilitiesTbody = document.getElementById('liabilitiesTableBody');
+ liabilitiesTbody.innerHTML = '';
+ 
+ let totalLoans = 0; 
+ let totalBills = 0; 
+
+ currentData.liabilities.forEach((item, index) => {
+ if (index < 3) {
+ totalLoans += Number(item.amount) || 0;
+ } else {
+ totalBills += Number(item.amount) || 0;
+ }
+
+ const tr = document.createElement('tr');
+ tr.innerHTML = `
+ <td><input type="text" class="editable-input" value="${item.name}" placeholder="أضف التزام..." onchange="updateLiabilityName(${index}, this.value)"></td>
+ <td><input type="number" step="0.01" class="editable-input" value="${item.amount}" onchange="updateLiabilityAmount(${index}, this.value)"></td>
+ `;
+ liabilitiesTbody.appendChild(tr);
+ });
+
+ let totalObligations = totalLoans + totalBills;
+
+ const lTotal1 = document.createElement('tr');
+ lTotal1.className = 'row-red-soft';
+ lTotal1.innerHTML = `<td>مجموع الفواتير والإضافي</td><td>${totalBills.toFixed(2)}</td>`;
+ liabilitiesTbody.appendChild(lTotal1);
+
+ const lTotal2 = document.createElement('tr');
+ lTotal2.className = 'row-red-soft';
+ lTotal2.innerHTML = `<td>مجموع القروض</td><td>${totalLoans.toFixed(2)}</td>`;
+ liabilitiesTbody.appendChild(lTotal2);
+
+ const lTotal3 = document.createElement('tr');
+ lTotal3.className = 'row-red-soft';
+ lTotal3.innerHTML = `<td>مجموع الالتزامات</td><td>${totalObligations.toFixed(2)}</td>`;
+ liabilitiesTbody.appendChild(lTotal3);
+
+ const summaryTbody = document.getElementById('summaryTableBody');
+ summaryTbody.innerHTML = `
+ <tr style="background: #f8fafc; font-weight: bold;">
+ <td style="padding: 12px;">الصافي المتبقي (مجموع الأصول - مجموع الالتزامات)</td>
+ <td style="padding: 12px; color: ${ (totalAssets - totalObligations) >= 0 ? '#16a34a' : '#dc2626' }; font-size: 1rem;">
+ ${(totalAssets - totalObligations).toFixed(2)} ر.س
+ </td>
+ </tr>
+ `;
+ }
+
+ function updateAssetName(index, val) { currentData.assets[index].name = val; }
+ function updateAssetAmount(index, val) { currentData.assets[index].amount = parseFloat(val) || 0; renderTables(); }
+ 
+ function updateLiabilityName(index, val) { currentData.liabilities[index].name = val; }
+ function updateLiabilityAmount(index, val) { currentData.liabilities[index].amount = parseFloat(val) || 0; renderTables(); }
+
+ renderTables();
+ </script>
+</body>
+</html>
