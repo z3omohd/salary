@@ -99,10 +99,18 @@
  background: transparent;
  padding: 4px;
  font-size: 0.85rem;
- text-align: right;
+ text-align: left;
  outline: none;
  border-radius: 4px;
- transition: all 0.2s; direction: ltr; /* إجبار الأرقام داخل الحقول لتكون بالنسق الإنجليزي */ }
+ transition: all 0.2s;
+ direction: ltr;
+ unicode-bidi: bidi-override;
+ }
+
+ input.editable-text {
+ direction: rtl;
+ text-align: right;
+ }
 
  input.editable-input:focus {
  background: #fff;
@@ -120,7 +128,7 @@
  font-weight: bold;
  color: #14532d;
  direction: ltr;
- text-align: right;
+ text-align: left;
  }
 
  .row-red-soft {
@@ -128,7 +136,7 @@
  font-weight: bold;
  color: #7f1d1d;
  direction: ltr;
- text-align: right;
+ text-align: left;
  }
 
  .summary-box {
@@ -203,8 +211,8 @@
  assets: [
  { name: "حساب الوكالة", amount: 50000 },
  { name: "بايننس", amount: 17300 },
- { name: "الراتب", amount: 5500 },
- { name: "المكافأة", amount: 5000 },
+ { name: "الراتب", amount: 0 },
+ { name: "المكافأة", amount: 0 },
  { name: "", amount: 0 }
  ],
  liabilities: [
@@ -226,15 +234,15 @@
  totalAssets += Number(item.amount) || 0;
  const tr = document.createElement('tr');
  tr.innerHTML = `
- <td><input type="text" class="editable-input" style="direction: rtl;" value="${item.name}" placeholder="أضف بند..." onchange="updateAssetName(${index}, this.value)"></td>
- <td><input type="number" step="0.01" class="editable-input" value="${item.amount}" onchange="updateAssetAmount(${index}, this.value)"></td>
+ <td><input type="text" class="editable-input editable-text" value="${item.name}" placeholder="أضف بند..." onchange="updateAssetName(${index}, this.value)"></td>
+ <td><input type="text" inputmode="decimal" class="editable-input" value="${item.amount !== 0 ? item.amount : ''}" placeholder="0.00" onchange="updateAssetAmount(${index}, this.value)"></td>
  `;
  assetsTbody.appendChild(tr);
  });
 
  const trTotal = document.createElement('tr');
  trTotal.className = 'row-green';
- trTotal.innerHTML = `<td>مجموع الاصول</td><td style="text-align: left; direction: ltr;">${totalAssets.toFixed(2)}</td>`;
+ trTotal.innerHTML = `<td>مجموع الاصول</td><td>${totalAssets.toFixed(2)}</td>`;
  assetsTbody.appendChild(trTotal);
 
  const liabilitiesTbody = document.getElementById('liabilitiesTableBody');
@@ -252,8 +260,8 @@
 
  const tr = document.createElement('tr');
  tr.innerHTML = `
- <td><input type="text" class="editable-input" style="direction: rtl;" value="${item.name}" placeholder="أضف التزام..." onchange="updateLiabilityName(${index}, this.value)"></td>
- <td><input type="number" step="0.01" class="editable-input" value="${item.amount}" onchange="updateLiabilityAmount(${index}, this.value)"></td>
+ <td><input type="text" class="editable-input editable-text" value="${item.name}" placeholder="أضف التزام..." onchange="updateLiabilityName(${index}, this.value)"></td>
+ <td><input type="text" inputmode="decimal" class="editable-input" value="${item.amount !== 0 ? item.amount : ''}" placeholder="0.00" onchange="updateLiabilityAmount(${index}, this.value)"></td>
  `;
  liabilitiesTbody.appendChild(tr);
  });
@@ -262,17 +270,17 @@
 
  const lTotal1 = document.createElement('tr');
  lTotal1.className = 'row-red-soft';
- lTotal1.innerHTML = `<td>مجموع الفواتير والإضافي</td><td style="text-align: left; direction: ltr;">${totalBills.toFixed(2)}</td>`;
+ lTotal1.innerHTML = `<td>مجموع الفواتير والإضافي</td><td>${totalBills.toFixed(2)}</td>`;
  liabilitiesTbody.appendChild(lTotal1);
 
  const lTotal2 = document.createElement('tr');
  lTotal2.className = 'row-red-soft';
- lTotal2.innerHTML = `<td>مجموع القروض</td><td style="text-align: left; direction: ltr;">${totalLoans.toFixed(2)}</td>`;
+ lTotal2.innerHTML = `<td>مجموع القروض</td><td>${totalLoans.toFixed(2)}</td>`;
  liabilitiesTbody.appendChild(lTotal2);
 
  const lTotal3 = document.createElement('tr');
  lTotal3.className = 'row-red-soft';
- lTotal3.innerHTML = `<td>مجموع الالتزامات</td><td style="text-align: left; direction: ltr;">${totalObligations.toFixed(2)}</td>`;
+ lTotal3.innerHTML = `<td>مجموع الالتزامات</td><td>${totalObligations.toFixed(2)}</td>`;
  liabilitiesTbody.appendChild(lTotal3);
 
  const summaryTbody = document.getElementById('summaryTableBody');
@@ -287,10 +295,18 @@
  }
 
  function updateAssetName(index, val) { currentData.assets[index].name = val; }
- function updateAssetAmount(index, val) { currentData.assets[index].amount = parseFloat(val) || 0; renderTables(); }
+ function updateAssetAmount(index, val) { 
+ let cleanVal = val.replace(/[^\d.]/g, '');
+ currentData.assets[index].amount = parseFloat(cleanVal) || 0; 
+ renderTables(); 
+ }
  
  function updateLiabilityName(index, val) { currentData.liabilities[index].name = val; }
- function updateLiabilityAmount(index, val) { currentData.liabilities[index].amount = parseFloat(val) || 0; renderTables(); }
+ function updateLiabilityAmount(index, val) { 
+ let cleanVal = val.replace(/[^\d.]/g, '');
+ currentData.liabilities[index].amount = parseFloat(cleanVal) || 0; 
+ renderTables(); 
+ }
 
  renderTables();
  </script>
