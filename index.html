@@ -4,7 +4,8 @@
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
  <title>Wasan Financial Suite</title>
- <!-- إعدادات الـ PWA ومتصفح الجوال --> <meta name="theme-color" content="#2563eb">
+ 
+ <meta name="theme-color" content="#2563eb">
  <meta name="apple-mobile-web-app-capable" content="yes">
  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
  <meta name="apple-mobile-web-app-title" content="Wasan Finance">
@@ -80,13 +81,13 @@
  border-left: 1px solid var(--border-color);
  }
 
- /* ترويسة الأصول (أزرق مؤسسي) */ .th-assets {
+ .th-assets {
  background-color: #3b82f6;
  color: white;
  font-weight: 600;
  }
 
- /* ترويسة الالتزامات (أحمر خفيف أنيق) */ .th-liabilities {
+ .th-liabilities {
  background-color: #ef4444;
  color: white;
  font-weight: 600;
@@ -115,14 +116,13 @@
  border-color: #e2e8f0;
  }
 
- /* مجموع الأصول (أخضر خفيف هادئ) */
  .row-green {
  background-color: #86efac !important;
  font-weight: bold;
  color: #14532d;
  }
 
- /* مجاميع الالتزامات (أحمر خفيف مريح للعين) */ .row-red-soft {
+ .row-red-soft {
  background-color: #fca5a5 !important;
  font-weight: bold;
  color: #7f1d1d;
@@ -200,8 +200,8 @@
  assets: [
  { name: "حساب الوكالة", amount: 50000 },
  { name: "بايننس", amount: 17300 },
- { name: "الراتب", amount: 0 },
- { name: "المكافأة", amount: 0 },
+ { name: "الراتب", amount: 5500 },
+ { name: "المكافأة", amount: 5000 },
  { name: "", amount: 0 }
  ],
  liabilities: [
@@ -268,7 +268,7 @@
  liabilitiesTbody.appendChild(lTotal2);
 
  const lTotal3 = document.createElement('tr');
- lTotal3.className = 'row-red-soft';
+ lTotal3.className, lTotal3.className = 'row-red-soft';
  lTotal3.innerHTML = `<td>مجموع الالتزامات</td><td>${totalObligations.toFixed(2)}</td>`;
  liabilitiesTbody.appendChild(lTotal3);
 
@@ -290,18 +290,6 @@
  function updateLiabilityAmount(index, val) { currentData.liabilities[index].amount = parseFloat(val) || 0; renderTables(); }
 
  renderTables();
-
- // تضمين ملف الـ Service Worker ليعمل التطبيق بدون انترنت كـ PWA if ('serviceWorker' in navigator) {
- window.addEventListener('load', () => {
- const blob = new Blob([
- `self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));\n` +
- `self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));\n` +
- `self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));`
- ], { type: 'text/javascript' });
- 
- navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
- });
- }
  </script>
 </body>
 </html>
